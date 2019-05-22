@@ -324,7 +324,7 @@ public class ArcSeekBar extends View {
             startX = (safeW - safeH) / 2.0f + getPaddingLeft();
             startY = getPaddingTop();
         }
-
+        startY = startY + mThumbRadius;
         // 得到显示区域和中心的
         RectF content = new RectF(startX + fix, startY + fix, startX + edgeLength, startY + edgeLength);
         mCenterX = content.centerX();

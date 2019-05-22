@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/ArcSeekBar.iml" filepath="$PROJECT_DIR$/ArcSeekBar.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/arc-seekbar/arc-seekbar.iml" filepath="$PROJECT_DIR$/arc-seekbar/arc-seekbar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/arc-seekbar-master.iml" filepath="$PROJECT_DIR$/arc-seekbar-master.iml" />
     </modules>
   </component>
 </project>

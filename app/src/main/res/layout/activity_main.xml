@@ -48,7 +48,7 @@
             app:arc_max="100"
             app:arc_min="0"
             app:arc_open_angle="180"
-            app:arc_progress="0"
+            app:arc_progress="50"
             app:arc_rotate_angle="90"
             app:arc_shadow_radius="0dp"
             app:arc_thumb_color="#fff"

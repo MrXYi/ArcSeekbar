@@ -15,6 +15,7 @@ import android.graphics.SweepGradient;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -57,6 +58,8 @@ public class ArcSeekBar extends View {
     private static final int DEFAULT_BORDER_WIDTH = 0;              // 默认描边宽度
     private static final int DEFAULT_BORDER_COLOR = 0xffffffff;     // 默认描边颜色
 
+    private static final int DEFAULT_PROGRESS_COLOR = 0xffff0000;     // 默认描边颜色
+
     private static final int DEFAULT_THUMB_COLOR = 0xffffffff;      // 拖动按钮颜色
     private static final int DEFAULT_THUMB_WIDTH = 2;               // 拖动按钮描边宽度 dp
     private static final int DEFAULT_THUMB_RADIUS = 15;             // 拖动按钮半径 dp
@@ -82,6 +85,8 @@ public class ArcSeekBar extends View {
     private int mBorderWidth;       // 描边宽度
     private int mBorderColor;       // 描边颜色
 
+    private int mProgressColor;
+
     private int mThumbColor;        // 拖动按钮颜色
     private float mThumbWidth;      // 拖动按钮宽度
     private float mThumbRadius;     // 拖动按钮半径
@@ -103,6 +108,7 @@ public class ArcSeekBar extends View {
     private Path mSeekPath;
     private Path mBorderPath;
     private Paint mArcPaint;
+    private Paint mProgressPaint;
     private Paint mThumbPaint;
     private Paint mBorderPaint;
     private Paint mShadowPaint;
@@ -157,6 +163,8 @@ public class ArcSeekBar extends View {
         mBorderWidth = ta.getDimensionPixelSize(R.styleable.ArcSeekBar_arc_border_width, dp2px(DEFAULT_BORDER_WIDTH));
         mBorderColor = ta.getColor(R.styleable.ArcSeekBar_arc_border_color, DEFAULT_BORDER_COLOR);
 
+        mProgressColor = ta.getColor(R.styleable.ArcSeekBar_arc_progress_color, DEFAULT_PROGRESS_COLOR);
+
         mThumbColor = ta.getColor(R.styleable.ArcSeekBar_arc_thumb_color, DEFAULT_THUMB_COLOR);
         mThumbRadius = ta.getDimensionPixelSize(R.styleable.ArcSeekBar_arc_thumb_radius, dp2px(DEFAULT_THUMB_RADIUS));
         mThumbShadowRadius = ta.getDimensionPixelSize(R.styleable.ArcSeekBar_arc_thumb_shadow_radius, dp2px(DEFAULT_THUMB_SHADOW_RADIUS));
@@ -206,6 +214,7 @@ public class ArcSeekBar extends View {
     // 初始化画笔
     private void initPaint() {
         initArcPaint();
+        initProgressPaint();
         initThumbPaint();
         initBorderPaint();
         initShadowPaint();
@@ -218,6 +227,16 @@ public class ArcSeekBar extends View {
         mArcPaint.setStrokeWidth(mArcWidth);
         mArcPaint.setStyle(Paint.Style.STROKE);
         mArcPaint.setStrokeCap(Paint.Cap.ROUND);
+    }
+
+    //初始化进度条画笔
+    private void initProgressPaint() {
+        mProgressPaint = new Paint();
+        mProgressPaint.setAntiAlias(true);
+        mProgressPaint.setStrokeWidth(mArcWidth);
+        mProgressPaint.setColor(mProgressColor);
+        mProgressPaint.setStyle(Paint.Style.STROKE);
+        mProgressPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     // 初始化拖动按钮画笔
@@ -305,9 +324,12 @@ public class ArcSeekBar extends View {
         setMeasuredDimension(MeasureSpec.makeMeasureSpec(ws, wm), MeasureSpec.makeMeasureSpec(hs, hm));
     }
 
+    private RectF rectF;
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        Log.i("test_rgb", "onSizeChanged");
         // 计算在当前大小下,内容应该显示的大小和起始位置
         int safeW = w - getPaddingLeft() - getPaddingRight();
         int safeH = h - getPaddingTop() - getPaddingBottom();
@@ -327,6 +349,7 @@ public class ArcSeekBar extends View {
         startY = startY + mThumbRadius;
         // 得到显示区域和中心的
         RectF content = new RectF(startX + fix, startY + fix, startX + edgeLength, startY + edgeLength);
+        rectF = content;
         mCenterX = content.centerX();
         mCenterY = content.centerY();
 
@@ -361,6 +384,7 @@ public class ArcSeekBar extends View {
         mArcPaint.setShader(gradient);
     }
 
+
     // 具体绘制
     @Override
     protected void onDraw(Canvas canvas) {
@@ -369,6 +393,8 @@ public class ArcSeekBar extends View {
         mShadowPaint.setShadowLayer(mShadowRadius * 2, 0, 0, getColor());
         canvas.drawPath(mBorderPath, mShadowPaint);
         canvas.drawPath(mSeekPath, mArcPaint);
+        float sweepAngle = (CIRCLE_ANGLE - mOpenAngle) * mProgressPresent;
+        canvas.drawArc(rectF, mOpenAngle / 2, sweepAngle, false, mProgressPaint);
         if (mBorderWidth > 0) {
             canvas.drawPath(mBorderPath, mBorderPaint);
         }
@@ -468,6 +494,7 @@ public class ArcSeekBar extends View {
     // 获取当前进度理论进度数值
     private float getCurrentProgress(float px, float py) {
         float diffAngle = getDiffAngle(px, py);
+        Log.i("test_rgb", "[diffAngle]" + diffAngle);
         float progress = diffAngle / (CIRCLE_ANGLE - mOpenAngle);
         if (progress < 0) progress = 0;
         if (progress > 1) progress = 1;
@@ -630,6 +657,7 @@ public class ArcSeekBar extends View {
 
     /**
      * 设置最大数值
+     *
      * @param max 最大数值
      */
     public void setMaxValue(int max) {
@@ -638,6 +666,7 @@ public class ArcSeekBar extends View {
 
     /**
      * 设置最小数值
+     *
      * @param min 最小数值
      */
     public void setMinValue(int min) {
